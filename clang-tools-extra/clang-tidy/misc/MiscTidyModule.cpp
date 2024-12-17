@@ -30,6 +30,7 @@
 #include "UnusedAliasDeclsCheck.h"
 #include "UnusedParametersCheck.h"
 #include "UnusedUsingDeclsCheck.h"
+#include "UnusedParameterCustomCheck.h"
 #include "UseAnonymousNamespaceCheck.h"
 #include "UseInternalLinkageCheck.h"
 
@@ -39,6 +40,8 @@ namespace misc {
 class MiscModule : public ClangTidyModule {
 public:
   void addCheckFactories(ClangTidyCheckFactories &CheckFactories) override {
+    CheckFactories.registerCheck<UnusedParameterCustomCheck>(
+        "misc-UnusedParameterCustom");
     CheckFactories.registerCheck<ConfusableIdentifierCheck>(
         "misc-confusable-identifiers");
     CheckFactories.registerCheck<ConstCorrectnessCheck>(
