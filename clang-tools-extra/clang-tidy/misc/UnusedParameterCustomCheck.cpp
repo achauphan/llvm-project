@@ -11,7 +11,7 @@
 #include <unordered_set>
 
 #include "UnusedParameterCustomCheck.h"
-//#include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Lex/Lexer.h"
 

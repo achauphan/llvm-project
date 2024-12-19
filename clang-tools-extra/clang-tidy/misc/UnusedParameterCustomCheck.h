@@ -10,7 +10,6 @@
 #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_UNUSEDPARAMETERCUSTOMCHECK_H
 
 #include "../ClangTidyCheck.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
 
 namespace clang::tidy::misc {
 
