@@ -48,7 +48,7 @@ static CharSourceRange getNodeLocationRange(const MatchFinder::MatchResult &resu
 
 UnusedParameterCustomCheck::~UnusedParameterCustomCheck() = default;
 UnusedParameterCustomCheck::UnusedParameterCustomCheck(StringRef name, ClangTidyContext *context)
-    : ClangTidyCheck(name, context) {}
+  : ClangTidyCheck(name, context) {}
 
 
 FixItHint UnusedParameterCustomCheck::removeArgument(const MatchFinder::MatchResult &result,
@@ -118,10 +118,8 @@ void UnusedParameterCustomCheck::warnAndFixUnusedParameter(const MatchFinder::Ma
                                                            const unsigned paramIdx) {
   const auto unusedParamDecl = matchedFunctionDecl->getParamDecl(paramIdx);
 
-  DiagnosticBuilder diagBuilder = diag(matchedFunctionDecl->getLocation(), "Parameter %0 is unused!") 
+  diag(matchedFunctionDecl->getLocation(), "Parameter %0 is unused!")
     << unusedParamDecl;
-
-  SourceRange unusedParamLocation(unusedParamDecl->getLocation());
 
   // Comment out unused parameters
   //diagBuilder << FixItHint::CreateReplacement(unusedParamLocation, (" /*"+unusedParamDecl->getName()+"*/").str());
@@ -133,15 +131,23 @@ void UnusedParameterCustomCheck::warnAndFixUnusedParameter(const MatchFinder::Ma
 
   // Fix all declarations of matched function for parameter
   for (const FunctionDecl *fd : matchedFunctionDecl->redecls()) {
-    SourceLocation paramLoc = fd->getParamDecl(paramIdx)->getLocation();
-    diag(paramLoc, "Fixing parameter %0 in %1") << unusedParamDecl << fd->getNameInfo().getAsString()
-      << removeParameter(result, fd, paramIdx);
+    if (fd->param_size()) {
+      SourceLocation paramLoc = fd->getParamDecl(paramIdx)->getLocation();
+      diag(paramLoc, "Fixing parameter %0 in %1")
+        << unusedParamDecl
+        << fd->getNameInfo().getAsString()
+        << removeParameter(result, fd, paramIdx);
+    }
   }
 
   for (const CallExpr *call : functionCallVisitor->getFunctionCalls(matchedFunctionDecl) ) {
-    SourceLocation argLoc = call->getArg(paramIdx)->getExprLoc();
-    diag(argLoc, "Fixing argument index %0 at call site  %1") << paramIdx << call->getDirectCallee()->getNameInfo().getAsString()
-      << removeArgument(result, call, paramIdx);
+    if (paramIdx < call->getNumArgs()) {
+      SourceLocation argLoc = call->getArg(paramIdx)->getExprLoc();
+      diag(argLoc, "Fixing argument index %0 at call site  %1")
+        << paramIdx
+        << call->getDirectCallee()->getNameInfo().getAsString()
+        << removeArgument(result, call, paramIdx);
+    }
   }
 
   return;
